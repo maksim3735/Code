@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Tracker - Трекер ігрової активності</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-container">
+        <div class="logo-block">
+          <h1 class="logo-title">Game<span>Tracker</span></h1>
+          <p class="logo-desc">Аналітика та облік ігрового часу</p>
+        </div>
+        <nav class="nav-menu">
+          <a href="#session-section" class="nav-link">Сесія</a>
+          <a href="#library-section" class="nav-link">Бібліотека</a>
+          <a href="#table-section" class="nav-link">База даних</a>
+          <a href="#stats-section" class="nav-link">Статистика</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section id="session-section" class="section-card session-section">
+        <button id="btn-start-session-view" class="btn btn-primary btn-big">
+          Почати ігрову сесію
+        </button>
+
+        <div id="session-panel" class="session-panel hidden">
+          <div id="session-no-games" class="session-warning hidden">
+            <p>У вашій бібліотеці ще немає ігор. Спочатку додайте гру в бібліотеку нижче!</p>
+            <button id="btn-cancel-session-init" class="btn btn-secondary">Зрозуміло</button>
+          </div>
+
+          <div id="session-select-block" class="session-block">
+            <h3>Оберіть гру для початку сесії</h3>
+            <div class="form-group">
+              <label for="session-game-select">Гра з бібліотеки:</label>
+              <select id="session-game-select" class="form-input"></select>
+              <span class="error-msg" id="err-session-game"></span>
+            </div>
+            <div class="action-buttons">
+              <button id="btn-confirm-start" class="btn btn-success">Підтвердити запуск</button>
+              <button id="btn-cancel-start" class="btn btn-secondary">Скасувати</button>
+            </div>
+          </div>
+
+          <div id="session-active-block" class="session-block hidden">
+            <div class="active-game-info">
+              <span class="pulse-indicator"></span>
+              <h2 id="active-game-title">Назва гри</h2>
+            </div>
+            <div class="timer-display" id="session-timer-text">00:00:00</div>
+            <div class="timer-status" id="session-status-text">Сесія триває...</div>
+            <div class="action-buttons">
+              <button id="btn-pause-session" class="btn btn-warning">Призупинити</button>
+              <button id="btn-stop-session" class="btn btn-danger">Завершити сесію</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="library-section" class="section-card">
+        <div class="section-header">
+          <h2>Бібліотека ігор</h2>
+          <button id="btn-open-add-modal" class="btn btn-primary">+ Додати гру</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="library-search-input"
+              class="form-input"
+              placeholder="Пошук за назвою..."
+            />
+          </div>
+          <div class="filters-box">
+            <div class="select-wrapper">
+              <label for="library-filter-select">Фільтр:</label>
+              <select id="library-filter-select" class="form-input">
+                <option value="all">Усі ігри</option>
+                <option value="favorites">Улюблені</option>
+                <option value="actual">Актуальні (за 7 днів)</option>
+              </select>
+            </div>
+            <div class="select-wrapper">
+              <label for="library-sort-select">Сортування:</label>
+              <select id="library-sort-select" class="form-input">
+                <option value="name">За алфавітом (А-Я)</option>
+                <option value="lastSessionDate">Останні зіграні</option>
+                <option value="createdAt">Спочатку нові</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="games-grid" class="games-grid"></div>
+        <div id="library-empty-msg" class="empty-state-message hidden">
+          Ігор за заданими параметрами не знайдено.
+        </div>
+
+        <div class="load-more-container">
+          <button id="btn-load-more" class="btn btn-secondary hidden">
+            Показати більше &darr;
+          </button>
+        </div>
+      </section>
+
+      <section id="table-section" class="section-card">
+        <div class="section-header">
+          <h2>Повна база ігрових записів</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-sort="name">Назва гри <span class="sort-icon"></span></th>
+                <th data-sort="totalTime">Загальний час <span class="sort-icon"></span></th>
+                <th data-sort="startDate">Дата початку <span class="sort-icon"></span></th>
+                <th data-sort="rating">Оцінка <span class="sort-icon"></span></th>
+                <th data-sort="sessionCount">Сесій <span class="sort-icon"></span></th>
+                <th data-sort="lastSessionDate">Остання сесія <span class="sort-icon"></span></th>
+                <th data-sort="lastSessionTime">Час останньої <span class="sort-icon"></span></th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container">
+          <button id="btn-prev-page" class="btn btn-secondary">&larr; Попередня</button>
+          <span id="pagination-info" class="pagination-info">Сторінка 1 з 1</span>
+          <button id="btn-next-page" class="btn btn-secondary">Наступна &rarr;</button>
+        </div>
+      </section>
+
+      <section id="stats-section" class="section-card">
+        <div class="section-header">
+          <h2>Аналітика та статистика</h2>
+        </div>
+        <div class="stats-summary-grid">
+          <div class="stat-box">
+            <span class="stat-label">Загальний час у грі</span>
+            <span id="stat-total-time" class="stat-value">0 год</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Кількість ігор</span>
+            <span id="stat-games-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Всього проведено сесій</span>
+            <span id="stat-sessions-count" class="stat-value">0</span>
+          </div>
+        </div>
+
+        <div class="charts-container">
+          <div class="chart-wrapper">
+            <h3>Розподіл часу топ-5 ігор</h3>
+            <canvas id="timeDistributionChart"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <h3>Топ-10 ігор за кількістю сесій</h3>
+            <canvas id="sessionsCountChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+    <div id="game-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3 id="modal-title">Додати гру</h3>
+          <button id="btn-close-modal" class="btn-close">&times;</button>
+        </div>
+        <form id="game-form" novalidate>
+          <input type="hidden" id="form-game-id" />
+
+          <div class="form-group">
+            <label for="form-game-name">Назва гри *</label>
+            <input type="text" id="form-game-name" class="form-input" placeholder="Game name" />
+            <span class="error-msg" id="err-name"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-game-image">Посилання на постер (URL)</label>
+            <input type="url" id="form-game-image" class="form-input" placeholder="https://..." />
+            <span class="error-msg" id="err-imageUrl"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-total-hours">Награно годин</label>
+              <input type="number" id="form-total-hours" class="form-input" min="0" value="0" />
+              <span class="error-msg" id="err-totalHours"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-total-minutes">Хвилин</label>
+              <input type="number" id="form-total-minutes" class="form-input" min="0" max="59" value="0" />
+              <span class="error-msg" id="err-totalMinutes"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-start-date">Дата першого запуску</label>
+              <input type="date" id="form-start-date" class="form-input" />
+              <span class="error-msg" id="err-startDate"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-game-rating">Оцінка досвіду (1-10)</label>
+              <input type="number" id="form-game-rating" class="form-input" min="1" max="10" step="0.1" placeholder="Оцінка гри" />
+              <span class="error-msg" id="err-rating"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-session-count">Кількість проведених сесій</label>
+            <input type="number" id="form-session-count" class="form-input" min="0" value="0" />
+            <span class="error-msg" id="err-sessionCount"></span>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-game-form" class="btn btn-secondary">Скасувати</button>
+            <button type="submit" class="btn btn-primary">Зберегти гру</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="rating-modal" class="modal-overlay hidden">
+      <div class="modal-window modal-small">
+        <div class="modal-header">
+          <h3>Завершення сесії</h3>
+        </div>
+        <div class="modal-body">
+          <p id="rating-summary-text">Сесія тривала    хв. Як ви оцінюєте поточний сеанс?</p>
+          <div class="form-group">
+            <label for="session-user-rating">Оцінка від 1 до 10:</label>
+            <input type="number" id="session-user-rating" class="form-input" min="1" max="10" placeholder="За замовчуванням 7" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-save-session-rating" class="btn btn-success">Зберегти в базу</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay hidden">
+      <div class="modal-window modal-small">
+        <div class="modal-header">
+          <h3>Підтвердження дії</h3>
+        </div>
+        <div class="modal-body">
+          <p id="delete-modal-text">Ви дійсно бажаєте видалити цю гру?</p>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-cancel-delete" class="btn btn-secondary">Скасувати</button>
+          <button id="btn-confirm-delete" class="btn btn-danger">Видалити</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
