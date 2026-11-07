@@ -1,0 +1,2200 @@
+
+
+файл куди скиані всі файли проекту.
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//index.html
+
+
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Tracker - Трекер ігрової активності</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-container">
+        <div class="logo-block">
+          <h1 class="logo-title">Game<span>Tracker</span></h1>
+          <p class="logo-desc">Аналітика та облік ігрового часу</p>
+        </div>
+        <nav class="nav-menu">
+          <a href="#session-section" class="nav-link">Сесія</a>
+          <a href="#library-section" class="nav-link">Бібліотека</a>
+          <a href="#table-section" class="nav-link">База даних</a>
+          <a href="#stats-section" class="nav-link">Статистика</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section id="session-section" class="section-card session-section">
+        <button id="btn-start-session-view" class="btn btn-primary btn-big">
+          Почати ігрову сесію
+        </button>
+
+        <div id="session-panel" class="session-panel hidden">
+          <div id="session-no-games" class="session-warning hidden">
+            <p>У вашій бібліотеці ще немає ігор. Спочатку додайте гру в бібліотеку нижче!</p>
+            <button id="btn-cancel-session-init" class="btn btn-secondary">Зрозуміло</button>
+          </div>
+
+          <div id="session-select-block" class="session-block">
+            <h3>Оберіть гру для початку сесії</h3>
+            <div class="form-group">
+              <label for="session-game-select">Гра з бібліотеки:</label>
+              <select id="session-game-select" class="form-input"></select>
+              <span class="error-msg" id="err-session-game"></span>
+            </div>
+            <div class="action-buttons">
+              <button id="btn-confirm-start" class="btn btn-success">Підтвердити запуск</button>
+              <button id="btn-cancel-start" class="btn btn-secondary">Скасувати</button>
+            </div>
+          </div>
+
+          <div id="session-active-block" class="session-block hidden">
+            <div class="active-game-info">
+              <span class="pulse-indicator"></span>
+              <h2 id="active-game-title">Назва гри</h2>
+            </div>
+            <div class="timer-display" id="session-timer-text">00:00:00</div>
+            <div class="timer-status" id="session-status-text">Сесія триває...</div>
+            <div class="action-buttons">
+              <button id="btn-pause-session" class="btn btn-warning">Призупинити</button>
+              <button id="btn-stop-session" class="btn btn-danger">Завершити сесію</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="library-section" class="section-card">
+        <div class="section-header">
+          <h2>Бібліотека ігор</h2>
+          <button id="btn-open-add-modal" class="btn btn-primary">+ Додати гру</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="library-search-input"
+              class="form-input"
+              placeholder="Пошук за назвою..."
+            />
+          </div>
+          <div class="filters-box">
+            <div class="select-wrapper">
+              <label for="library-filter-select">Фільтр:</label>
+              <select id="library-filter-select" class="form-input">
+                <option value="all">Усі ігри</option>
+                <option value="favorites">Улюблені</option>
+                <option value="actual">Актуальні (за 7 днів)</option>
+              </select>
+            </div>
+            <div class="select-wrapper">
+              <label for="library-sort-select">Сортування:</label>
+              <select id="library-sort-select" class="form-input">
+                <option value="name">За алфавітом (А-Я)</option>
+                <option value="lastSessionDate">Останні зіграні</option>
+                <option value="createdAt">Спочатку нові</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="games-grid" class="games-grid"></div>
+        <div id="library-empty-msg" class="empty-state-message hidden">
+          Ігор за заданими параметрами не знайдено.
+        </div>
+
+        <div class="load-more-container">
+          <button id="btn-load-more" class="btn btn-secondary hidden">
+            Показати більше &darr;
+          </button>
+        </div>
+      </section>
+
+      <section id="table-section" class="section-card">
+        <div class="section-header">
+          <h2>Повна база ігрових записів</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-sort="name">Назва гри <span class="sort-icon"></span></th>
+                <th data-sort="totalTime">Загальний час <span class="sort-icon"></span></th>
+                <th data-sort="startDate">Дата початку <span class="sort-icon"></span></th>
+                <th data-sort="rating">Оцінка <span class="sort-icon"></span></th>
+                <th data-sort="sessionCount">Сесій <span class="sort-icon"></span></th>
+                <th data-sort="lastSessionDate">Остання сесія <span class="sort-icon"></span></th>
+                <th data-sort="lastSessionTime">Час останньої <span class="sort-icon"></span></th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container">
+          <button id="btn-prev-page" class="btn btn-secondary">&larr; Попередня</button>
+          <span id="pagination-info" class="pagination-info">Сторінка 1 з 1</span>
+          <button id="btn-next-page" class="btn btn-secondary">Наступна &rarr;</button>
+        </div>
+      </section>
+
+      <section id="stats-section" class="section-card">
+        <div class="section-header">
+          <h2>Аналітика та статистика</h2>
+        </div>
+        <div class="stats-summary-grid">
+          <div class="stat-box">
+            <span class="stat-label">Загальний час у грі</span>
+            <span id="stat-total-time" class="stat-value">0 год</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Кількість ігор</span>
+            <span id="stat-games-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Всього проведено сесій</span>
+            <span id="stat-sessions-count" class="stat-value">0</span>
+          </div>
+        </div>
+
+        <div class="charts-container">
+          <div class="chart-wrapper">
+            <h3>Розподіл часу топ-5 ігор</h3>
+            <canvas id="timeDistributionChart"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <h3>Топ-10 ігор за кількістю сесій</h3>
+            <canvas id="sessionsCountChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+    <div id="game-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3 id="modal-title">Додати гру</h3>
+          <button id="btn-close-modal" class="btn-close">&times;</button>
+        </div>
+        <form id="game-form" novalidate>
+          <input type="hidden" id="form-game-id" />
+
+          <div class="form-group">
+            <label for="form-game-name">Назва гри *</label>
+            <input type="text" id="form-game-name" class="form-input" placeholder="Game name" />
+            <span class="error-msg" id="err-name"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-game-image">Посилання на постер (URL)</label>
+            <input type="url" id="form-game-image" class="form-input" placeholder="https://..." />
+            <span class="error-msg" id="err-imageUrl"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-total-hours">Награно годин</label>
+              <input type="number" id="form-total-hours" class="form-input" min="0" value="0" />
+              <span class="error-msg" id="err-totalHours"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-total-minutes">Хвилин</label>
+              <input type="number" id="form-total-minutes" class="form-input" min="0" max="59" value="0" />
+              <span class="error-msg" id="err-totalMinutes"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-start-date">Дата першого запуску</label>
+              <input type="date" id="form-start-date" class="form-input" />
+              <span class="error-msg" id="err-startDate"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-game-rating">Оцінка досвіду (1-10)</label>
+              <input type="number" id="form-game-rating" class="form-input" min="1" max="10" step="0.1" placeholder="Оцінка гри" />
+              <span class="error-msg" id="err-rating"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-session-count">Кількість проведених сесій</label>
+            <input type="number" id="form-session-count" class="form-input" min="0" value="0" step="1" /> 
+            <span class="error-msg" id="err-sessionCount"></span>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-game-form" class="btn btn-secondary">Скасувати</button>
+            <button type="submit" class="btn btn-primary">Зберегти гру</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="rating-modal" class="modal-overlay hidden">
+      <div class="modal-window modal-small">
+        <div class="modal-header">
+          <h3>Завершення сесії</h3>
+        </div>
+        <div class="modal-body">
+          <p id="rating-summary-text">Сесія тривала    хв. Як ви оцінюєте поточний сеанс?</p>
+          <div class="form-group">
+            <label for="session-user-rating">Оцінка від 1 до 10:</label>
+            <input type="number" id="session-user-rating" class="form-input" min="1" max="10" placeholder="За замовчуванням 7" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-save-session-rating" class="btn btn-success">Зберегти в базу</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay hidden">
+      <div class="modal-window modal-small">
+        <div class="modal-header">
+          <h3>Підтвердження дії</h3>
+        </div>
+        <div class="modal-body">
+          <p id="delete-modal-text">Ви дійсно бажаєте видалити цю гру?</p>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-cancel-delete" class="btn btn-secondary">Скасувати</button>
+          <button id="btn-confirm-delete" class="btn btn-danger">Видалити</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// main.css
+
+
+:root {
+  --bg-main: #0f111a;
+  --bg-card: #171926;
+  --bg-card-hover: #1f2233;
+  --bg-input: #11131f;
+
+  --accent-purple: #7928ca;
+  --accent-blue: #0070f3;
+  --accent-pink: #ff0080;
+  --accent-gradient: linear-gradient(135deg, #7928ca 10%, #0070f3 100%);
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #2b2f45;
+
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-glow: 0 4px 20px rgba(121, 40, 202, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+  padding-bottom: 60px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.app-header {
+  background-color: rgba(23, 25, 38, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.logo-title span {
+  background: var(--accent-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.nav-menu {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-main);
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.section-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: #fff;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #26293d;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: #31354f;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: #fff;
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #fff;
+}
+
+.btn-big {
+  padding: 16px 32px;
+  font-size: 18px;
+  margin: 0 auto;
+  display: block;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--accent-blue);
+}
+
+.error-msg {
+  color: var(--danger-color);
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.session-section {
+  text-align: center;
+}
+
+.session-panel {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--bg-input);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.session-warning {
+  color: var(--warning-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.active-game-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pulse-indicator {
+  width: 12px;
+  height: 12px;
+  background-color: var(--success-color);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--success-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.timer-display {
+  font-size: 44px;
+  font-weight: 800;
+  font-family: monospace;
+  color: #fff;
+  margin: 10px 0;
+  text-shadow: 0 0 15px rgba(0, 112, 243, 0.4);
+}
+
+.timer-status {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filters-box {
+  display: flex;
+  gap: 12px;
+}
+
+.select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.empty-state-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.game-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-purple);
+}
+
+.card-poster-wrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background-color: var(--bg-input);
+}
+
+.card-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(15, 17, 26, 0.7);
+  border: none;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.btn-favorite:hover {
+  transform: scale(1.15);
+}
+
+.btn-favorite.active {
+  color: var(--accent-pink);
+}
+
+.card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.card-actions .btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background-color: var(--bg-input);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.data-table th:hover {
+  color: var(--text-main);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.stats-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.chart-wrapper {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.chart-wrapper h3 {
+  font-size: 15px;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-window {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 520px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-small {
+  max-width: 400px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  color: var(--text-main);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.empty-table-cell {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//main.ts
+
+
+
+
+import type { 
+  Game, 
+  ActiveSession, 
+  LibraryFilter, 
+  LibrarySort, 
+  TableSort, 
+  SortDirection,
+  GameFormData 
+} from "./types/game.types";
+
+import { 
+  loadGames, 
+  saveGames, 
+  loadActiveSession, 
+  saveActiveSession, 
+  clearActiveSession 
+} from "./services/storage.service";
+
+import { 
+  calculateNewRating, 
+  getTodayDateString, 
+  formatMinutes 
+} from "./utils/calculations";
+
+import { validateGameForm } from "./utils/validation";
+
+import { filterAndSortGames, renderGameCards } from "./ui/library.view";
+import { sortTableGames, renderTable, updateSortIcons } from "./ui/table.view";
+import { updateStatsSummary, renderTimeChart, renderSessionsChart } from "./ui/charts.view";
+import { 
+  formatTimerDisplay, 
+  getSessionSeconds, 
+  getSessionMinutes, 
+  gameSelectList, 
+  updateSessionUI 
+} from "./ui/session.view";
+
+
+let games: Game[] = loadGames();
+let activeSession: ActiveSession | null = loadActiveSession();
+let timerInterval: number | null = null;
+
+let librarySearch = "";
+let libraryFilter: LibraryFilter = "all";
+let librarySort: LibrarySort = "name";
+let visibleGamesCount = 8;
+let gameIdPendingDelete: string | null = null; 
+
+let tableSortField: TableSort = "name";
+let tableSortDirection: SortDirection = "up";
+let tableCurrentPage = 1;
+
+
+
+// Сесія
+const btnStartSessionView = document.getElementById("btn-start-session-view") as HTMLButtonElement;
+const sessionPanel = document.getElementById("session-panel") as HTMLElement;
+const sessionNoGames = document.getElementById("session-no-games") as HTMLElement;
+const btnCancelSessionInit = document.getElementById("btn-cancel-session-init") as HTMLButtonElement;
+const sessionSelectBlock = document.getElementById("session-select-block") as HTMLElement;
+const sessionGameSelect = document.getElementById("session-game-select") as HTMLSelectElement;
+const btnConfirmStart = document.getElementById("btn-confirm-start") as HTMLButtonElement;
+const btnCancelStart = document.getElementById("btn-cancel-start") as HTMLButtonElement;
+const sessionActiveBlock = document.getElementById("session-active-block") as HTMLElement;
+const activeGameTitle = document.getElementById("active-game-title") as HTMLElement;
+const sessionTimerText = document.getElementById("session-timer-text") as HTMLElement;
+const sessionStatusText = document.getElementById("session-status-text") as HTMLElement;
+const btnPauseSession = document.getElementById("btn-pause-session") as HTMLButtonElement;
+const btnStopSession = document.getElementById("btn-stop-session") as HTMLButtonElement;
+const errSessionGame = document.getElementById("err-session-game") as HTMLElement;
+
+// Бібліотека
+const btnOpenAddModal = document.getElementById("btn-open-add-modal") as HTMLButtonElement;
+const btnLoadMore = document.getElementById("btn-load-more") as HTMLButtonElement;
+const librarySearchInput = document.getElementById("library-search-input") as HTMLInputElement;
+const libraryFilterSelect = document.getElementById("library-filter-select") as HTMLSelectElement;
+const librarySortSelect = document.getElementById("library-sort-select") as HTMLSelectElement;
+const gamesGrid = document.getElementById("games-grid") as HTMLElement;
+const libraryEmptyMsg = document.getElementById("library-empty-msg") as HTMLElement;
+
+// Таблиця
+const tableBody = document.getElementById("table-body") as HTMLElement;
+const tableHeaderCells = document.querySelectorAll(".data-table th") as NodeListOf<HTMLTableCellElement>;
+const btnPrevPage = document.getElementById("btn-prev-page") as HTMLButtonElement;
+const btnNextPage = document.getElementById("btn-next-page") as HTMLButtonElement;
+const paginationInfo = document.getElementById("pagination-info") as HTMLElement;
+
+// Статистика
+const statTotalTime = document.getElementById("stat-total-time") as HTMLElement;
+const statGamesCount = document.getElementById("stat-games-count") as HTMLElement;
+const statSessionsCount = document.getElementById("stat-sessions-count") as HTMLElement;
+const timeChartCanvas = document.getElementById("timeDistributionChart") as HTMLCanvasElement;
+const sessionsChartCanvas = document.getElementById("sessionsCountChart") as HTMLCanvasElement;
+
+// Модалка гри
+const gameModal = document.getElementById("game-modal") as HTMLElement;
+const modalTitle = document.getElementById("modal-title") as HTMLElement;
+const btnCloseModal = document.getElementById("btn-close-modal") as HTMLButtonElement;
+const btnCancelGameForm = document.getElementById("btn-cancel-game-form") as HTMLButtonElement;
+const gameForm = document.getElementById("game-form") as HTMLFormElement;
+
+const formGameId = document.getElementById("form-game-id") as HTMLInputElement;
+const formGameName = document.getElementById("form-game-name") as HTMLInputElement;
+const formGameImage = document.getElementById("form-game-image") as HTMLInputElement;
+const formTotalHours = document.getElementById("form-total-hours") as HTMLInputElement;
+const formTotalMinutes = document.getElementById("form-total-minutes") as HTMLInputElement;
+const formStartDate = document.getElementById("form-start-date") as HTMLInputElement;
+const formGameRating = document.getElementById("form-game-rating") as HTMLInputElement;
+const formSessionCount = document.getElementById("form-session-count") as HTMLInputElement;
+
+// Модалка оцінки сесії
+const ratingModal = document.getElementById("rating-modal") as HTMLElement;
+const ratingSummaryText = document.getElementById("rating-summary-text") as HTMLElement;
+const sessionUserRating = document.getElementById("session-user-rating") as HTMLInputElement;
+const btnSaveSessionRating = document.getElementById("btn-save-session-rating") as HTMLButtonElement;
+
+const deleteModal = document.getElementById("delete-modal") as HTMLElement;
+const deleteModalText = document.getElementById("delete-modal-text") as HTMLElement;
+const btnCancelDelete = document.getElementById("btn-cancel-delete") as HTMLButtonElement;
+const btnConfirmDelete = document.getElementById("btn-confirm-delete") as HTMLButtonElement;
+
+
+
+// Оновлення UI
+
+function refreshLibrary(): void {
+  const filtered = filterAndSortGames(games, librarySearch, libraryFilter, librarySort);
+
+  const visibleSubset = filtered.slice(0, visibleGamesCount);
+
+  renderGameCards(visibleSubset, gamesGrid, libraryEmptyMsg, {
+    onToggleFavorite: handleToggleFavorite,
+    onEdit: handleOpenEditModal,
+    onDelete: handleOpenDeleteModal, 
+  });
+
+  if (filtered.length > visibleGamesCount) {
+    btnLoadMore.classList.remove("hidden");
+  } else {
+    btnLoadMore.classList.add("hidden");
+  }
+}
+
+function refreshTable(): void {
+  const sorted = sortTableGames(games, tableSortField, tableSortDirection);
+  renderTable(sorted, tableCurrentPage, tableBody, paginationInfo, btnPrevPage, btnNextPage);
+  updateSortIcons(tableHeaderCells, tableSortField, tableSortDirection);
+}
+
+function refreshStats(): void {
+  updateStatsSummary(games, statTotalTime, statGamesCount, statSessionsCount);
+  renderTimeChart(timeChartCanvas, games);
+  renderSessionsChart(sessionsChartCanvas, games);
+}
+
+function refreshSessionUI(): void {
+  gameSelectList(sessionGameSelect, games);
+  updateSessionUI(activeSession, games, {
+    panel: sessionPanel,
+    noGamesBlock: sessionNoGames,
+    selectBlock: sessionSelectBlock,
+    activeBlock: sessionActiveBlock,
+    timerText: sessionTimerText,
+    statusText: sessionStatusText,
+    btnPause: btnPauseSession,
+    gameTitle: activeGameTitle,
+  });
+}
+
+function refreshAll(): void {
+  refreshLibrary();
+  refreshTable();
+  refreshStats();
+  refreshSessionUI();
+}
+
+
+// Таймер сесії
+
+function startTimerTicker(): void {
+  if (timerInterval) clearInterval(timerInterval);
+
+  timerInterval = window.setInterval(() => {
+    if (!activeSession) return;
+    const seconds = getSessionSeconds(activeSession);
+    sessionTimerText.textContent = formatTimerDisplay(seconds);
+  }, 
+  1000);
+}
+
+function stopTimerTicker(): void {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+
+// події сесії
+
+sessionGameSelect.addEventListener("change", () => {
+  if (errSessionGame) {
+    errSessionGame.textContent = "";
+  }
+});
+
+btnStartSessionView.addEventListener("click", () => {
+  btnStartSessionView.classList.add("hidden");
+  sessionPanel.classList.remove("hidden");
+  refreshSessionUI();
+});
+
+btnCancelSessionInit.addEventListener("click", () => {
+  sessionPanel.classList.add("hidden");
+  btnStartSessionView.classList.remove("hidden");
+});
+
+btnCancelStart.addEventListener("click", () => {
+  if (errSessionGame) errSessionGame.textContent = "";
+  sessionPanel.classList.add("hidden");
+  btnStartSessionView.classList.remove("hidden");
+});
+
+btnConfirmStart.addEventListener("click", () => {
+  const selectedId = sessionGameSelect.value;
+
+  if (!selectedId) {
+    errSessionGame.textContent = "Будь ласка, оберіть гру зі списку перед початком!";
+    return;
+  }
+
+  errSessionGame.textContent = "";
+
+  activeSession = {
+    gameId: selectedId,
+    startTime: Date.now(),
+    pauseStartTime: null,
+    allPauseTime: 0,
+    paused: false,
+  };
+
+  saveActiveSession(activeSession);
+  refreshSessionUI();
+  startTimerTicker();
+});
+
+btnPauseSession.addEventListener("click", () => {
+  if (!activeSession) return;
+
+  if (!activeSession.paused) {
+    activeSession.paused = true;
+    activeSession.pauseStartTime = Date.now();
+  } else {
+    activeSession.paused = false;
+    if (activeSession.pauseStartTime) {
+      activeSession.allPauseTime += Date.now() - activeSession.pauseStartTime;
+      activeSession.pauseStartTime = null;
+    }
+  }
+
+  saveActiveSession(activeSession);
+  refreshSessionUI();
+});
+
+btnStopSession.addEventListener("click", () => {
+  if (!activeSession) return;
+
+  const durationMin = getSessionMinutes(activeSession);
+  ratingSummaryText.textContent = `Сесія тривала ${formatMinutes(durationMin)}. Як ви оцінюєте поточний сеанс?`;
+  sessionUserRating.value = "";
+  ratingModal.classList.remove("hidden");
+});
+
+btnSaveSessionRating.addEventListener("click", () => {
+  if (!activeSession) return;
+
+  const durationMin = getSessionMinutes(activeSession);
+  const score = Math.max(1, Math.min(10, Number(sessionUserRating.value) || 7));
+
+  games = games.map((g) => {
+    if (g.id !== activeSession?.gameId) return g;
+
+    const newRating = calculateNewRating(g.rating, g.sessionCount, score); 
+    return {
+      ...g,  // спред, щоб не писати всі поля 
+      totalTime: Math.round(g.totalTime + durationMin),
+      sessionCount: g.sessionCount + 1,
+      rating: newRating,
+      lastSessionDate: new Date().toISOString(),
+      lastSessionTime: durationMin,
+    };
+  });
+
+  saveGames(games);
+  clearActiveSession();
+  activeSession = null;
+  stopTimerTicker();
+
+  ratingModal.classList.add("hidden");
+  sessionPanel.classList.add("hidden");
+  btnStartSessionView.classList.remove("hidden");
+
+  refreshAll();
+});
+
+
+// бібліотека
+
+function handleToggleFavorite(id: string): void {
+  games = games.map((g) => (g.id === id ? { ...g, favorite: !g.favorite } : g)); 
+  saveGames(games); 
+  refreshLibrary();
+}
+
+function handleOpenDeleteModal(id: string): void {
+  const targetGame = games.find((g) => g.id === id);
+  if (!targetGame) return;
+
+  gameIdPendingDelete = id;
+  deleteModalText.textContent = `Ви дійсно бажаєте видалити гру "${targetGame.name}"?`;
+  deleteModal.classList.remove("hidden");
+}
+
+btnCancelDelete.addEventListener("click", () => {
+  deleteModal.classList.add("hidden");
+  gameIdPendingDelete = null;
+});
+
+btnConfirmDelete.addEventListener("click", () => {
+  if (!gameIdPendingDelete) return;
+
+  const id = gameIdPendingDelete;
+  games = games.filter((g) => g.id !== id);
+  saveGames(games);
+
+  if (activeSession && activeSession.gameId === id) {
+    clearActiveSession();
+    activeSession = null;
+    stopTimerTicker();
+  }
+
+  deleteModal.classList.add("hidden");
+  gameIdPendingDelete = null;
+
+  refreshAll();
+});
+
+librarySearchInput.addEventListener("input", () => {
+  librarySearch = librarySearchInput.value;
+  visibleGamesCount = 8; 
+  refreshLibrary();
+});
+
+libraryFilterSelect.addEventListener("change", () => {
+  libraryFilter = libraryFilterSelect.value as LibraryFilter;
+  visibleGamesCount = 8; 
+  refreshLibrary();
+});
+
+librarySortSelect.addEventListener("change", () => {
+  librarySort = librarySortSelect.value as LibrarySort;
+  visibleGamesCount = 8; 
+  refreshLibrary();
+});
+
+btnLoadMore.addEventListener("click", () => {
+  visibleGamesCount += 8; 
+  refreshLibrary();
+});
+
+
+// додавання та редагування гри
+
+function clearFormErrors(): void {
+  const errorElements = gameForm.querySelectorAll(".error-msg");
+  errorElements.forEach((el) => (el.textContent = ""));
+}
+
+function openModal(title: string): void {
+  modalTitle.textContent = title;
+  clearFormErrors();
+  gameModal.classList.remove("hidden");
+}
+
+function closeModal(): void {
+  gameModal.classList.add("hidden");
+  gameForm.reset();
+}
+
+btnOpenAddModal.addEventListener("click", () => {
+  formGameId.value = "";
+  gameForm.reset();
+  formStartDate.value = getTodayDateString();
+  openModal("Додати гру");
+});
+
+btnCloseModal.addEventListener("click", closeModal);
+btnCancelGameForm.addEventListener("click", closeModal);
+
+function handleOpenEditModal(game: Game): void {
+  formGameId.value = game.id;
+  formGameName.value = game.name;
+  formGameImage.value = game.imageUrl;
+  formTotalHours.value = Math.floor(game.totalTime / 60).toString();
+  formTotalMinutes.value = (game.totalTime % 60).toString();
+  formStartDate.value = game.startDate || getTodayDateString();
+  formGameRating.value = game.rating !== null ? game.rating.toString() : "";
+  formSessionCount.value = game.sessionCount.toString();
+
+  openModal("Редагувати гру");
+}
+
+// форма гри
+gameForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  clearFormErrors();
+
+  const rawRating = formGameRating.value.trim();
+  const formData: GameFormData = {
+    name: formGameName.value,
+    imageUrl: formGameImage.value,
+    totalHours: Number(formTotalHours.value) || 0,
+    totalMinutes: Number(formTotalMinutes.value) || 0,
+    startDate: formStartDate.value,
+    rating: rawRating !== "" ? Number(rawRating) : null,
+    sessionCount: Number(formSessionCount.value) || 0,
+  };
+
+  const validation = validateGameForm(formData);
+
+  if (!validation.isValid) {
+    Object.keys(validation.errors).forEach((key) => {
+      const errEl = document.getElementById(`err-${key}`);
+      if (errEl) errEl.textContent = validation.errors[key];
+    });
+    return;
+  }
+
+  const calculatedTotalMinutes = Math.round(formData.totalHours * 60 + formData.totalMinutes);
+  const isEditing = Boolean(formGameId.value);
+
+  if (isEditing) {
+    games = games.map((g) => {
+      if (g.id !== formGameId.value) return g;
+      return {
+        ...g,
+        name: formData.name.trim(),
+        imageUrl: formData.imageUrl.trim(),
+        totalTime: calculatedTotalMinutes,
+        startDate: formData.startDate,
+        rating: formData.rating,
+        sessionCount: formData.sessionCount,
+      };
+    });
+  } else {
+    const newGame: Game = {
+      id: "game_" + Date.now().toString(),
+      name: formData.name.trim(),
+      imageUrl: formData.imageUrl.trim(),
+      totalTime: calculatedTotalMinutes,
+      startDate: formData.startDate || getTodayDateString(),
+      rating: formData.rating,
+      sessionCount: formData.sessionCount,
+      lastSessionDate: null,
+      lastSessionTime: 0,
+      favorite: false,
+    };
+    games.push(newGame);
+  }
+
+  saveGames(games);
+  closeModal();
+  refreshAll();
+});
+
+
+// таблиця
+
+tableHeaderCells.forEach((th) => {
+  th.addEventListener("click", () => {
+    const sortKey = th.dataset.sort as TableSort | undefined;
+    if (!sortKey) return;
+
+    if (tableSortField === sortKey) {
+      tableSortDirection = tableSortDirection === "up" ? "down" : "up";
+    } else {
+      tableSortField = sortKey;
+      tableSortDirection = "up";
+    }
+
+    refreshTable();
+  });
+});
+
+btnPrevPage.addEventListener("click", () => {
+  if (tableCurrentPage > 1) {
+    tableCurrentPage--;
+    refreshTable();
+  }
+});
+
+btnNextPage.addEventListener("click", () => {
+  const maxPages = Math.ceil(games.length / 10) || 1;
+  if (tableCurrentPage < maxPages) {
+    tableCurrentPage++;
+    refreshTable();
+  }
+});
+
+
+// ЗАПУСК
+
+function init(): void {
+  refreshAll();
+
+  if (activeSession) {
+    btnStartSessionView.classList.add("hidden");
+    sessionPanel.classList.remove("hidden");
+    startTimerTicker();
+  }
+}
+
+init();
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// types/game.types.ts
+
+
+export interface Game {
+  id: string;                         // ID гри
+  name: string;                       // Назва гри
+  imageUrl: string;                   // посилання на постер
+  totalTime: number;                  // Загальний награний (хв)
+  startDate: string;                  // Дата початку гри
+  rating: number | null;              // Оцінка
+  sessionCount: number;               // Кількість зіграних сесій
+  lastSessionDate: string | null;     // Дата останнього сеансу
+  lastSessionTime: number;            // Тривалість останнього сеансу
+  favorite: boolean;                  // Улюблена гра (y/n)
+}
+
+export interface ActiveSession {
+  gameId: string;                     // ID гри, у яку зараз грає користувач
+  startTime: number;                  // Час початку сесії
+  pauseStartTime: number | null;      // Коли натиснули паузу 
+  allPauseTime: number;               // Час паузи 
+  paused: boolean;                    // Пауза чи ні
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: { [key: string]: string };
+}
+
+export interface GameFormData {
+  name: string;
+  imageUrl: string;
+  totalHours: number;
+  totalMinutes: number;
+  startDate: string;
+  rating: number | null;
+  sessionCount: number;
+}
+
+export type LibraryFilter = "all" | "favorites" | "actual";
+
+export type SortDirection = "up" | "down";
+
+export type LibrarySort = "name" | "lastSessionDate" | "createdAt";
+
+export type TableSort = 
+  | "name" 
+  | "totalTime" 
+  | "startDate" 
+  | "rating" 
+  | "sessionCount" 
+  | "lastSessionDate" 
+  | "lastSessionTime";
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // services/storage.service.ts
+
+
+import type { Game, ActiveSession } from "../types/game.types";
+
+const GAMES_STORAGE_KEY = "game_tracker_games";
+const ACTIVE_SESSION_STORAGE_KEY = "game_tracker_active_session";
+
+
+export function loadGames(): Game[] {
+  try {
+    const rawData = localStorage.getItem(GAMES_STORAGE_KEY);
+    if (!rawData) {
+      return [];
+    }
+    return JSON.parse(rawData) as Game[];
+  } catch (error) {
+    console.error("Помилка при зчитуванні списку ігор зі сховища:", error);
+    return [];
+  }
+}
+
+
+export function saveGames(games: Game[]): void {
+  try {
+    const rawData = JSON.stringify(games);
+    localStorage.setItem(GAMES_STORAGE_KEY, rawData);
+  } catch (error) {
+    console.error("Помилка при збереженні списку ігор у сховище:", error);
+  }
+}
+
+
+export function loadActiveSession(): ActiveSession | null {
+  try {
+    const rawData = localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY);
+    if (!rawData) {
+      return null;
+    }
+    return JSON.parse(rawData) as ActiveSession;
+  } catch (error) {
+    console.error("Помилка при зчитуванні активної сесії:", error);
+    return null;
+  }
+}
+
+
+export function saveActiveSession(session: ActiveSession): void {
+  try {
+    const rawData = JSON.stringify(session);
+    localStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, rawData);
+  } catch (error) {
+    console.error("Помилка при збереженні активної сесії:", error);
+  }
+}
+
+
+export function clearActiveSession(): void {
+  localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // utils/validation.ts
+
+
+
+import type { ValidationResult, GameFormData } from "../types/game.types";
+
+
+export function validateGameForm(data: GameFormData): ValidationResult {
+  const errors: Record<string, string> = {};
+
+  const trimName = data.name.trim();
+  if (!trimName) {
+    errors["name"] = "Назва гри є обов'язковою для заповнення.";
+  } else if (trimName.length < 2) {
+    errors["name"] = "Назва повинна містити мінімум 2 символи.";
+  } else if (trimName.length > 60) {
+    errors["name"] = "Назва не може перевищувати 60 символів.";
+  }
+
+
+  const trimmedUrl = data.imageUrl.trim();
+  if (trimmedUrl.length > 0) {
+    const isUrl = trimmedUrl.startsWith("http://") || trimmedUrl.startsWith("https://");
+    if (!isUrl) {
+      errors["imageUrl"] = "Введіть коректне посилання, що починається з http:// або https://";
+    }
+  }
+
+
+  if (isNaN(data.totalHours) || data.totalHours < 0) {
+    errors["totalHours"] = "Кількість годин не може бути від'ємною.";
+  }
+
+  if (isNaN(data.totalMinutes) || data.totalMinutes < 0 || data.totalMinutes > 59) {
+    errors["totalMinutes"] = "Хвилини повинні бути в діапазоні від 0 до 59.";
+  }
+
+
+  if (data.rating !== null) {
+    if (isNaN(data.rating) || data.rating < 1 || data.rating > 10) {
+      errors["rating"] = "Оцінка повинна бути числом від 1 до 10.";
+    }
+  }
+
+
+if (isNaN(data.sessionCount) || data.sessionCount < 0 || !Number.isInteger(data.sessionCount)) {
+    errors["sessionCount"] = "Кількість сесій має бути цілим невід'ємним числом.";
+  }
+
+
+if (data.startDate) {
+    const inputDate = new Date(data.startDate);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    const minDate = new Date("1970-01-01");
+
+    if (isNaN(inputDate.getTime())) {
+      errors["startDate"] = "Некоректний формат дати.";
+    } else if (inputDate > today) {
+      errors["startDate"] = "Дата початку гри не може бути пізнішою за сьогоднішню.";
+    } else if (inputDate < minDate) {
+      errors["startDate"] = "Дата початку гри не може бути ранішою за 01.01.1970.";
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // utils/calculations.ts
+
+
+
+import type { Game } from "../types/game.types";
+
+
+export function calculateNewRating(
+  currentRating: number | null,
+  sessionCount: number,
+  newScore: number
+): number {
+  if (currentRating === null || sessionCount === 0) {
+    return Math.round(newScore * 10) / 10;
+  }
+
+  const updatedRating = (currentRating * sessionCount + newScore) / (sessionCount + 1);
+  return Math.round(updatedRating * 10) / 10;
+}
+
+
+export function formatMinutes(minutes: number): string {
+  if (minutes <= 0) {
+    return "0 хв";
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (hours === 0) {
+    return `${remainingMinutes} хв`;
+  }
+
+  if (remainingMinutes === 0) {
+    return `${hours} год`;
+  }
+
+  return `${hours} год ${remainingMinutes} хв`;
+}
+
+
+export function isGameActual(lastSessionDate: string | null): boolean {
+  if (!lastSessionDate) {
+    return false;
+  }
+
+  const sessionDate = new Date(lastSessionDate);
+  if (isNaN(sessionDate.getTime())) {
+    return false;
+  }
+
+  const now = new Date();
+  const diffTimeMs = now.getTime() - sessionDate.getTime();
+  const diffDays = diffTimeMs / (1000 * 60 * 60 * 24);
+
+  return diffDays >= 0 && diffDays <= 7;
+}
+
+
+export function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function formatDateToDisplay(dateStr: string | null): string {
+  if (!dateStr) {
+    return "-";
+  }
+
+  const cleanDate = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+  const parts = cleanDate.split("-");
+
+  if (parts.length !== 3) {
+    return dateStr;
+  }
+
+  const [year, month, day] = parts;
+  return `${day}.${month}.${year}`;
+}
+
+
+export function getTopGamesData(games: Game[]): { labels: string[]; data: number[] } {
+  if (games.length === 0) {
+    return { labels: [], data: [] };
+  }
+
+  const sorted = [...games].sort((a, b) => b.totalTime - a.totalTime);
+
+  if (sorted.length <= 5) {
+    return {
+      labels: sorted.map((g) => g.name),
+      data: sorted.map((g) => g.totalTime),
+    };
+  }
+
+  const top5 = sorted.slice(0, 5);
+  const other = sorted.slice(5);
+  const otherTotalTime = other.reduce((s, g) => s + g.totalTime, 0);
+
+  return {
+    labels: [...top5.map((g) => g.name), "Інші"],
+    data: [...top5.map((g) => g.totalTime), otherTotalTime],
+  };
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ui/session.view.ts
+
+
+
+import type { Game, ActiveSession } from "../types/game.types";
+
+
+export function formatTimerDisplay(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const h = String(hours).padStart(2, "0");
+  const m = String(minutes).padStart(2, "0");
+  const s = String(seconds).padStart(2, "0");
+
+  return `${h}:${m}:${s}`;
+}
+
+
+export function getSessionSeconds(session: ActiveSession): number {  //чиста тривалість сесії без урахування пауз
+  const now = Date.now(); 
+  let pauseTime = session.allPauseTime;
+
+  if (session.paused && session.pauseStartTime) {
+    pauseTime += now - session.pauseStartTime;
+  }
+
+  const timeMs = now - session.startTime - pauseTime;
+  return Math.max(0, Math.floor(timeMs / 1000));
+}
+
+
+export function getSessionMinutes(session: ActiveSession): number {
+  const seconds = getSessionSeconds(session);
+  return Math.max(1, Math.round(seconds / 60));
+}
+
+
+export function gameSelectList(
+  selectEl: HTMLSelectElement,
+  games: Game[]
+): void {
+  selectEl.innerHTML = "";
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- Оберіть гру зі списку --";
+  defaultOption.disabled = true; 
+  defaultOption.selected = true; 
+  selectEl.appendChild(defaultOption);
+
+  games.forEach((g) => {
+    const opt = document.createElement("option");
+    opt.value = g.id;
+    opt.textContent = g.name;
+    selectEl.appendChild(opt);
+  });
+}
+
+
+export function updateSessionUI(
+  session: ActiveSession | null,
+  games: Game[],
+  elements: {
+    panel: HTMLElement;
+    noGamesBlock: HTMLElement;
+    selectBlock: HTMLElement;
+    activeBlock: HTMLElement;
+    timerText: HTMLElement;
+    statusText: HTMLElement;
+    btnPause: HTMLButtonElement;
+    gameTitle: HTMLElement;
+  }
+): void {
+
+  if (!session) {
+    elements.activeBlock.classList.add("hidden");
+
+    if (games.length === 0) {
+      elements.noGamesBlock.classList.remove("hidden");
+      elements.selectBlock.classList.add("hidden");
+    } else {
+      elements.noGamesBlock.classList.add("hidden");
+      elements.selectBlock.classList.remove("hidden");
+    }
+    return;
+  }
+
+  elements.noGamesBlock.classList.add("hidden");
+  elements.selectBlock.classList.add("hidden");
+  elements.activeBlock.classList.remove("hidden");
+
+  const currentGame = games.find((g) => g.id === session.gameId);
+  elements.gameTitle.textContent = currentGame ? currentGame.name : "Невідома гра";
+
+  if (session.paused) {
+    elements.statusText.textContent = "Сесія на паузі";
+    elements.btnPause.textContent = "Продовжити";
+    elements.btnPause.className = "btn btn-success";
+  } else {
+    elements.statusText.textContent = "Сесія триває...";
+    elements.btnPause.textContent = "Призупинити";
+    elements.btnPause.className = "btn btn-warning";
+  }
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ui/library.view.ts
+
+
+
+import type { Game, LibraryFilter, LibrarySort } from "../types/game.types";
+import { formatMinutes, formatDateToDisplay, isGameActual } from "../utils/calculations";
+
+import defaultPosterImg from "../assets/void.jpg"; 
+
+const DEFAULT_POSTER = defaultPosterImg;
+
+export function filterAndSortGames(
+  games: Game[],
+  search: string,
+  filterType: LibraryFilter, 
+  sortBy: LibrarySort
+): Game[] {
+
+
+  let result = [...games];
+
+
+  const slovo = search.trim().toLowerCase();
+  if (slovo.length > 0) {
+    result = result.filter((g) => g.name.toLowerCase().includes(slovo));
+  }
+
+  
+  if (filterType === "favorites") {
+    result = result.filter((g) => g.favorite);
+  } else if (filterType === "actual") {
+    result = result.filter((g) => isGameActual(g.lastSessionDate));
+  }
+
+
+  if (sortBy === "name") {
+    result.sort((a, b) => a.name.localeCompare(b.name, "uk"));
+  } else if (sortBy === "lastSessionDate") {
+    result.sort((a, b) => {
+      const timeA = a.lastSessionDate ? new Date(a.lastSessionDate).getTime() : 0;
+      const timeB = b.lastSessionDate ? new Date(b.lastSessionDate).getTime() : 0;
+      return timeB - timeA;
+    });
+  } else if (sortBy === "createdAt") {
+    result.sort((a, b) => b.id.localeCompare(a.id));
+  }
+
+  return result;
+}
+
+
+export function renderGameCards(
+  games: Game[],
+  container: HTMLElement,
+  emptyMessageEl: HTMLElement,
+  callbacks: {
+    onToggleFavorite: (id: string) => void;
+    onEdit: (game: Game) => void;
+    onDelete: (id: string) => void;
+  }
+): void {
+  container.innerHTML = "";
+
+  if (games.length === 0) {
+    emptyMessageEl.classList.remove("hidden");
+    return;
+  }
+
+  emptyMessageEl.classList.add("hidden");
+
+  games.forEach((game) => {
+    const card = document.createElement("div");
+    card.className = "game-card";
+
+    const posterUrl = game.imageUrl && game.imageUrl.trim().length > 0 
+      ? game.imageUrl : DEFAULT_POSTER;
+
+    const ratingText = game.rating !== null ? `★ ${game.rating}` : "Без оцінки";
+    const lastPlayedText = formatDateToDisplay(game.lastSessionDate);
+
+    card.innerHTML = `
+      <div class="card-poster-wrapper">
+        <img 
+          src="${posterUrl}" 
+          alt="${game.name}" 
+          class="card-poster"
+          onerror="this.src='${DEFAULT_POSTER}'"
+        />
+        <button 
+          class="btn-favorite ${game.favorite ? "active" : ""}" 
+          title="${game.favorite ? "Видалити з улюблених" : "Додати в улюблені"}"
+        >
+          ${game.favorite ? "❤️" : "🤍"}
+        </button>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title" title="${game.name}">${game.name}</h3>
+        <div class="card-meta">
+          <span>Час: <strong>${formatMinutes(game.totalTime)}</strong></span>
+          <span>Оцінка: <strong>${ratingText}</strong></span>
+        </div>
+        <div class="card-meta">
+          <span>Остання гра: <strong>${lastPlayedText}</strong></span>
+          <span>Сесій: <strong>${game.sessionCount}</strong></span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-secondary btn-edit">Редагувати</button>
+          <button class="btn btn-danger btn-delete">Видалити</button>
+        </div>
+      </div>
+    `;
+
+    const btnFav = card.querySelector(".btn-favorite") as HTMLButtonElement;
+    btnFav.addEventListener("click", () => callbacks.onToggleFavorite(game.id));
+
+    const btnEdit = card.querySelector(".btn-edit") as HTMLButtonElement;
+    btnEdit.addEventListener("click", () => callbacks.onEdit(game));
+
+    const btnDelete = card.querySelector(".btn-delete") as HTMLButtonElement;
+    btnDelete.addEventListener("click", () => callbacks.onDelete(game.id));
+
+    container.appendChild(card);
+  });
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ui/table.view.ts
+
+
+
+
+import type { Game, TableSort, SortDirection } from "../types/game.types";
+import { formatMinutes, formatDateToDisplay } from "../utils/calculations";
+
+
+export function sortTableGames(
+  games: Game[],
+  sortField: TableSort,
+  direction: SortDirection
+): Game[] {
+  const result = [...games];
+
+  result.sort((a, b) => {
+
+    let x = 0;  // Значення для порівняння
+
+    switch (sortField) {
+
+      case "name":
+        x = a.name.localeCompare(b.name, "uk");
+        break;
+
+      case "totalTime":
+        x = a.totalTime - b.totalTime;
+        break;
+
+      case "startDate": {
+        const timeA = a.startDate ? new Date(a.startDate).getTime() : 0;
+        const timeB = b.startDate ? new Date(b.startDate).getTime() : 0;
+        x = timeA - timeB;
+        break;
+      }
+
+      case "rating": {
+        const ratingA = a.rating ?? -1;
+        const ratingB = b.rating ?? -1;
+        x = ratingA - ratingB;
+        break;
+      }
+
+      case "sessionCount":
+        x = a.sessionCount - b.sessionCount;
+        break;
+
+      case "lastSessionDate": {
+        const timeA = a.lastSessionDate ? new Date(a.lastSessionDate).getTime() : 0;
+        const timeB = b.lastSessionDate ? new Date(b.lastSessionDate).getTime() : 0;
+        x = timeA - timeB;
+        break;
+      }
+
+      case "lastSessionTime":
+        x = a.lastSessionTime - b.lastSessionTime;
+        break;
+    }
+
+    return direction === "up" ? x : -x;
+  });
+
+  return result;
+}
+
+
+export function renderTable(
+  games: Game[],
+  currentPage: number,
+  tbodyEl: HTMLElement,
+  paginationInfoEl: HTMLElement,
+  btnPrev: HTMLButtonElement,
+  btnNext: HTMLButtonElement
+): void {
+
+  tbodyEl.innerHTML = "";
+
+  const totalPages = Math.ceil(games.length / 10) || 1;
+  const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+
+  const startIndex = (safePage - 1) * 10;
+  const pageGames = games.slice(startIndex, startIndex + 10);
+
+  if (pageGames.length === 0) {
+    const emptyRow = document.createElement("tr");
+    emptyRow.innerHTML = `<td colspan="7" class="empty-table-cell">Дані відсутні</td>`;
+    tbodyEl.appendChild(emptyRow);
+  } else {
+    pageGames.forEach((game) => {
+      const row = document.createElement("tr");
+
+      const ratingDisplay = game.rating !== null ? `★ ${game.rating}` : "-";
+      const startDateDisplay = formatDateToDisplay(game.startDate);
+      const lastDateDisplay = formatDateToDisplay(game.lastSessionDate);
+      const lastSessionDisplay = game.lastSessionTime > 0 ? formatMinutes(game.lastSessionTime) : "-";
+
+      row.innerHTML = `
+        <td><strong>${game.name}</strong></td>
+        <td>${formatMinutes(game.totalTime)}</td>
+        <td>${startDateDisplay}</td>
+        <td>${ratingDisplay}</td>
+        <td>${game.sessionCount}</td>
+        <td>${lastDateDisplay}</td>
+        <td>${lastSessionDisplay}</td>
+      `;
+
+      tbodyEl.appendChild(row);
+    });
+  }
+
+  paginationInfoEl.textContent = `Сторінка ${safePage} з ${totalPages}`;
+  btnPrev.disabled = safePage <= 1;
+  btnNext.disabled = safePage >= totalPages;
+}
+
+
+export function updateSortIcons(
+  headerCells: NodeListOf<HTMLTableCellElement>,
+  currentSort: TableSort,
+  currentDirection: SortDirection
+): void {
+  headerCells.forEach((th) => {
+    const field = th.dataset.sort as TableSort | undefined;
+    const iconSpan = th.querySelector(".sort-icon");
+
+    if (!iconSpan) return;
+
+    if (field === currentSort) {
+      iconSpan.textContent = currentDirection === "up" ? " ▲" : " ▼";
+    } else {
+      iconSpan.textContent = "";
+    }
+  });
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ui/chart.view.ts
+
+
+
+import { Chart, registerables } from "chart.js";
+import type { Game } from "../types/game.types";
+import { getTopGamesData } from "../utils/calculations";
+
+Chart.register(...registerables);
+
+let timeChart: Chart | null = null;
+let sessionsChart: Chart | null = null;
+
+
+export function updateStatsSummary(
+  games: Game[],
+  totalTimeEl: HTMLElement,
+  gamesCountEl: HTMLElement,
+  sessionsCountEl: HTMLElement
+): void {
+  const totalMinutes = games.reduce((sum, g) => sum + g.totalTime, 0);
+  const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
+  const totalSessions = games.reduce((sum, g) => sum + g.sessionCount, 0);
+
+  totalTimeEl.textContent = `${totalHours} год`;
+  gamesCountEl.textContent = games.length.toString();
+  sessionsCountEl.textContent = totalSessions.toString();
+}
+
+
+export function renderTimeChart(canvas: HTMLCanvasElement, games: Game[]): void {
+
+  const { labels, data } = getTopGamesData(games);
+
+  if (timeChart) {
+    timeChart.destroy();
+  }
+
+  const hoursData = data.map((min) => Math.round((min / 60) * 10) / 10);
+  timeChart = new Chart(canvas, {
+    type: "pie",
+    data: {
+      labels: labels.length > 0 ? labels : ["Немає даних"],
+      datasets: [
+        {
+          data: hoursData.length > 0 ? hoursData : [1],
+          backgroundColor: [
+            "#0609bd",
+            "#ba29f4",
+            "#ff0080",
+            "#10b981",
+            "#f59e0b",
+            "#64748b",
+          ],
+          borderColor: "#11111c",
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            color: "#94a3b8",
+            font: { size: 12 },
+          },
+        },
+      },
+    },
+  });
+}
+
+
+export function renderSessionsChart(canvas: HTMLCanvasElement, games: Game[]): void {
+
+  if (sessionsChart) {
+    sessionsChart.destroy();
+  }
+
+  const top10 = [...games]
+    .sort((a, b) => b.sessionCount - a.sessionCount)
+    .slice(0, 10);
+
+  const labels = top10.map((g) => g.name);
+  const data = top10.map((g) => g.sessionCount);
+
+  sessionsChart = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: labels.length > 0 ? labels : ["Немає даних"],
+      datasets: [
+        {
+          label: "Кількість сесій",
+          data: data.length > 0 ? data : [0],
+          backgroundColor: "#0070f3",
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        x: {
+          ticks: { color: "#94a3b8" },
+          grid: { display: false },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: "#94a3b8",
+            stepSize: 1,
+          },
+          grid: { color: "#2b2f45" },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+      },
+    },
+  });
+}

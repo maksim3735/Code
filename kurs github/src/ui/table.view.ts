@@ -93,7 +93,7 @@ export function renderTable(
       const lastSessionDisplay = game.lastSessionTime > 0 ? formatMinutes(game.lastSessionTime) : "-";
 
       row.innerHTML = `
-        <td><strong>${game.name}</strong></td>
+        <td><strong></strong></td>
         <td>${formatMinutes(game.totalTime)}</td>
         <td>${startDateDisplay}</td>
         <td>${ratingDisplay}</td>
@@ -102,6 +102,7 @@ export function renderTable(
         <td>${lastSessionDisplay}</td>
       `;
 
+      row.querySelector("strong")!.textContent = game.name;
       tbodyEl.appendChild(row);
     });
   }

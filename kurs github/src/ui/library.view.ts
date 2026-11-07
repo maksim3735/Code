@@ -79,8 +79,6 @@ export function renderGameCards(
     card.innerHTML = `
       <div class="card-poster-wrapper">
         <img 
-          src="${posterUrl}" 
-          alt="${game.name}" 
           class="card-poster"
           onerror="this.src='${DEFAULT_POSTER}'"
         />
@@ -92,7 +90,7 @@ export function renderGameCards(
         </button>
       </div>
       <div class="card-body">
-        <h3 class="card-title" title="${game.name}">${game.name}</h3>
+        <h3 class="card-title"></h3>
         <div class="card-meta">
           <span>Час: <strong>${formatMinutes(game.totalTime)}</strong></span>
           <span>Оцінка: <strong>${ratingText}</strong></span>
@@ -107,6 +105,14 @@ export function renderGameCards(
         </div>
       </div>
     `;
+
+    const imgEl = card.querySelector(".card-poster") as HTMLImageElement;
+    imgEl.src = posterUrl;
+    imgEl.alt = game.name;
+
+    const titleEl = card.querySelector(".card-title") as HTMLElement;
+    titleEl.textContent = game.name;
+    titleEl.title = game.name;
 
     const btnFav = card.querySelector(".btn-favorite") as HTMLButtonElement;
     btnFav.addEventListener("click", () => callbacks.onToggleFavorite(game.id));

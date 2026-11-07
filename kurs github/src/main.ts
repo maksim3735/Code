@@ -144,6 +144,13 @@ function refreshLibrary(): void {
 }
 
 function refreshTable(): void {
+  const maxPages = Math.ceil(games.length / 10) || 1;
+  if (tableCurrentPage > maxPages) {
+    tableCurrentPage = maxPages;
+  } else if (tableCurrentPage < 1) {
+    tableCurrentPage = 1;
+  }
+
   const sorted = sortTableGames(games, tableSortField, tableSortDirection);
   renderTable(sorted, tableCurrentPage, tableBody, paginationInfo, btnPrevPage, btnNextPage);
   updateSortIcons(tableHeaderCells, tableSortField, tableSortDirection);
