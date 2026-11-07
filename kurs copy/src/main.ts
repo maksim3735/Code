@@ -284,8 +284,8 @@ btnSaveSessionRating.addEventListener("click", () => {
 
     const newRating = calculateNewRating(g.rating, g.sessionCount, score); 
     return {
-      ...g,                                     // спред, щоб не писати всі поля 
-      totalTime: g.totalTime + durationMin,
+      ...g,  // спред, щоб не писати всі поля 
+      totalTime: Math.round(g.totalTime + durationMin),
       sessionCount: g.sessionCount + 1,
       rating: newRating,
       lastSessionDate: new Date().toISOString(),
@@ -437,7 +437,7 @@ gameForm.addEventListener("submit", (e) => {
     return;
   }
 
-  const calculatedTotalMinutes = formData.totalHours * 60 + formData.totalMinutes;
+  const calculatedTotalMinutes = Math.round(formData.totalHours * 60 + formData.totalMinutes);
   const isEditing = Boolean(formGameId.value);
 
   if (isEditing) {

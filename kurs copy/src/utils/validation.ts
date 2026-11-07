@@ -41,8 +41,8 @@ export function validateGameForm(data: GameFormData): ValidationResult {
   }
 
 
-  if (isNaN(data.sessionCount) || data.sessionCount < 0) {
-    errors["sessionCount"] = "Кількість сесій не може бути меншою за 0.";
+if (isNaN(data.sessionCount) || data.sessionCount < 0 || !Number.isInteger(data.sessionCount)) {
+    errors["sessionCount"] = "Кількість сесій має бути цілим невід'ємним числом.";
   }
 
 
