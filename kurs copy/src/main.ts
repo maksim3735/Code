@@ -310,6 +310,7 @@ btnSaveSessionRating.addEventListener("click", () => {
 
 function handleToggleFavorite(id: string): void {
   games = games.map((g) => (g.id === id ? { ...g, favorite: !g.favorite } : g)); 
+  saveGames(games); 
   refreshLibrary();
 }
 
