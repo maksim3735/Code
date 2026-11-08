@@ -57,13 +57,14 @@ export function renderTimeChart(canvas: HTMLCanvasElement, games: Game[]): void 
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false, 
       plugins: {
         legend: {
           position: "bottom",
           labels: {
             color: "#94a3b8",
             font: { size: 12 },
+            padding: 16,
           },
         },
       },
@@ -100,7 +101,7 @@ export function renderSessionsChart(canvas: HTMLCanvasElement, games: Game[]): v
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false, 
       scales: {
         x: {
           ticks: { color: "#94a3b8" },
