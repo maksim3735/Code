@@ -1,0 +1,425 @@
+
+
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TutorFinder — Онлайн-платформа пошуку репетиторів</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-container">
+        <div class="logo-block">
+          <h1 class="logo-title">Tutor<span>Finder</span></h1>
+          <p class="logo-desc">Онлайн-сервіс підбору викладачів та планування навчання</p>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#booking-section" class="nav-link">Запис на урок</a>
+          <a href="#schedule-section" class="nav-link">Розклад занять</a>
+          <a href="#tutors-section" class="nav-link">Репетитори</a>
+          <a href="#students-section" class="nav-link">Учні</a>
+          <a href="#stats-section" class="nav-link">Статистика</a>
+        </nav>
+      </div>
+    </header>
+
+
+    <main class="main-content">
+      <section id="booking-section" class="section-card hero-card">
+        <h2 class="hero-title">Планування навчального процесу</h2>
+        <p class="hero-subtitle">
+          Оберіть викладача, зручний час та призначте індивідуальне заняття разом із домашнім завданням
+        </p>
+        <button id="btn-open-lesson-modal" class="btn btn-primary btn-big">
+          + Призначити нове заняття
+        </button>
+      </section>
+
+
+      <section id="schedule-section" class="section-card">
+        <div class="section-header">
+          <h2>Розклад занять</h2>
+          <button id="btn-cleanup-schedule" class="btn btn-secondary">
+            Очистити скасовані заняття
+          </button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="schedule-search-input"
+              class="form-input"
+              placeholder="Пошук за іменем..."
+            />
+          </div>
+          <div class="filters-box">
+            <label for="schedule-filter-select">Показати:</label>
+            <select id="schedule-filter-select" class="form-input">
+              <option value="ALL">Увесь архів занять</option>
+              <option value="SCHEDULED">Тільки заплановані</option>
+              <option value="COMPLETED">Тільки проведені</option>
+              <option value="ACTUAL">Актуальні заняття</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Дата і час</th>
+                <th>Викладач</th>
+                <th>Предмет</th>
+                <th>Учень</th>
+                <th>Тривалість</th>
+                <th>Формат</th>
+                <th>Домашнє завдання</th>
+                <th>Вартість</th>
+                <th>Статус</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container">
+          <button id="btn-schedule-prev" class="btn btn-secondary">&larr; Попередня</button>
+          <span id="schedule-page-info" class="pagination-info">Сторінка 1 з 1</span>
+          <button id="btn-schedule-next" class="btn btn-secondary">Наступна &rarr;</button>
+        </div>
+      </section>
+
+
+      <section id="tutors-section" class="section-card">
+        <div class="section-header">
+          <h2>Наші репетитори</h2>
+          <button id="btn-open-tutor-modal" class="btn btn-primary">+ Додати репетитора</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="tutor-search-input"
+              class="form-input"
+              placeholder="Пошук за іменем..."
+            />
+          </div>
+          <div class="filters-box">
+            <label for="tutor-subject-filter">Предмет:</label>
+            <select id="tutor-subject-filter" class="form-input">
+              <option value="ALL">Усі предмети</option>
+              <option value="Математика">Математика</option>
+              <option value="Англійська мова">Англійська мова</option>
+              <option value="Фізика">Фізика</option>
+              <option value="Програмування">Програмування</option>
+              <option value="Історія України">Історія України</option>
+              <option value="Хімія">Хімія</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="tutors-grid" class="tutors-grid"></div>
+        <div id="tutors-empty-msg" class="empty-state-message hidden">
+          Викладачів за вашим запитом не знайдено.
+        </div>
+      </section>
+
+
+      <section id="students-section" class="section-card">
+        <div class="section-header">
+          <h2>Список учнів</h2>
+          <button id="btn-open-student-modal" class="btn btn-primary">+ Додати учня</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="student-search-input"
+              class="form-input"
+              placeholder="Пошук за іменем учня..."
+            />
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ім'я та прізвище</th>
+                <th>Клас / Курс</th>
+                <th>Електронна пошта</th>
+                <th>Контактний телефон</th>
+                <th>Невиконані ДЗ</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container">
+          <button id="btn-students-prev" class="btn btn-secondary">&larr; Попередня</button>
+          <span id="students-page-info" class="pagination-info">Сторінка 1 з 1</span>
+          <button id="btn-students-next" class="btn btn-secondary">Наступна &rarr;</button>
+        </div>
+      </section>
+
+
+      <section id="stats-section" class="section-card">
+        <div class="section-header">
+          <h2>Аналітика та статистика платформи</h2>
+        </div>
+
+        <div class="stats-summary-grid">
+          <div class="stat-box">
+            <span class="stat-label">Активних викладачів</span>
+            <span id="stat-tutors-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Зареєстровано учнів</span>
+            <span id="stat-students-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Проведено занять</span>
+            <span id="stat-lessons-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Загальна сума навчання</span>
+            <span id="stat-total-revenue" class="stat-value">0 грн</span>
+          </div>
+        </div>
+
+        <div class="charts-container">
+          <div class="chart-wrapper">
+            <h3>Дохід викладачів за проведеними уроками (грн)</h3>
+            <canvas id="earningsChart"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <h3>Популярність навчальних предметів</h3>
+            <canvas id="subjectsChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+    <!-- модалки -->
+    <div id="lesson-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3>Призначити нове заняття</h3>
+          <button id="btn-close-lesson-modal" class="btn-close">&times;</button>
+        </div>
+
+        <form id="lesson-form" novalidate>
+          <div class="form-group">
+            <label for="lesson-tutor-select">Викладач та предмет *</label>
+            <select id="lesson-tutor-select" class="form-input"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-student-select">Учень *</label>
+            <select id="lesson-student-select" class="form-input"></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="lesson-time-input">Дата і час початку *</label>
+              <input type="datetime-local" id="lesson-time-input" class="form-input" placeholder= "Дата і час" />
+              <span class="error-msg" id="err-lessonTime"></span>
+            </div>
+            <div class="form-group">
+              <label for="lesson-duration-input">Тривалість (хв) *</label>
+              <input type="number" id="lesson-duration-input" class="form-input" placeholder="Час" step="5" />
+              <span class="error-msg" id="err-lessonDuration"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-format-select">Формат проведення *</label>
+            <select id="lesson-format-select" class="form-input">
+              <option value="ONLINE">Онлайн (Відеозв'язок)</option>
+              <option value="OFFLINE">Офлайн (Очно)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="lesson-hw-title">Тема домашнього завдання *</label>
+              <input
+                type="text"
+                id="lesson-hw-title"
+                class="form-input"
+                placeholder="Наприклад: Квадратні рівняння"
+              />
+              <span class="error-msg" id="err-hwTitle"></span>
+            </div>
+            <div class="form-group">
+              <label for="lesson-hw-due">Здати до (дедлайн) *</label>
+              <input type="datetime-local" id="lesson-hw-due" class="form-input" />
+              <span class="error-msg" id="err-hwDueDate"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-hw-desc">Коментар до завдання</label>
+            <input
+              type="text"
+              id="lesson-hw-desc"
+              class="form-input"
+              placeholder="Номери вправ або спосіб виконання..."
+            />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-lesson-form" class="btn btn-secondary">Скасувати</button>
+            <button type="submit" class="btn btn-primary">Зберегти заняття</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <div id="tutor-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3 id="tutor-modal-title">Додати репетитора</h3>
+          <button id="btn-close-tutor-modal" class="btn-close">&times;</button>
+        </div>
+
+        <form id="tutor-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-tutor-first">Ім'я *</label>
+              <input type="text" id="form-tutor-first" class="form-input" placeholder="Ім'я" />
+              <span class="error-msg" id="err-tutorFirstName"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-tutor-last">Прізвище *</label>
+              <input type="text" id="form-tutor-last" class="form-input" placeholder="Прізвище" />
+              <span class="error-msg" id="err-tutorLastName"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-tutor-email">Електронна пошта *</label>
+              <input type="email" id="form-tutor-email" class="form-input" placeholder="name@gmail.com" />
+              <span class="error-msg" id="err-tutorEmail"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-tutor-phone">Номер телефону *</label>
+              <input type="text" id="form-tutor-phone" class="form-input" placeholder="+380123456789" />
+              <span class="error-msg" id="err-tutorPhone"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-tutor-subject">Предмет викладання *</label>
+              <select id="form-tutor-subject" class="form-input">
+                <option value="Математика">Математика</option>
+                <option value="Англійська мова">Англійська мова</option>
+                <option value="Фізика">Фізика</option>
+                <option value="Програмування">Програмування</option>
+                <option value="Історія України">Історія України</option>
+                <option value="Хімія">Хімія</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="form-tutor-qual">Кваліфікація *</label>
+              <input type="text" id="form-tutor-qual" class="form-input" placeholder="Кваліфікація" />
+              <span class="error-msg" id="err-tutorQualification"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-tutor-rate">Вартість години (грн) *</label>
+              <input type="number" id="form-tutor-rate" class="form-input" placeholder="Вартість" />
+              <span class="error-msg" id="err-tutorRate"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-tutor-exp">Досвід роботи (років) *</label>
+              <input type="number" id="form-tutor-exp" class="form-input" placeholder="кількість років" />
+              <span class="error-msg" id="err-tutorExperience"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-tutor-bio">Про викладача</label>
+            <input
+              type="text"
+              id="form-tutor-bio"
+              class="form-input"
+              placeholder="Короткий опис методики та досягнень..."
+            />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-tutor-form" class="btn btn-secondary">Скасувати</button>
+            <button type="submit" class="btn btn-primary">Зберегти викладача</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <div id="student-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3>Додати нового учня</h3>
+          <button id="btn-close-student-modal" class="btn-close">&times;</button>
+        </div>
+
+        <form id="student-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-student-first">Ім'я учня *</label>
+              <input type="text" id="form-student-first" class="form-input" placeholder="Ім'я" />
+              <span class="error-msg" id="err-studentFirstName"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-student-last">Прізвище учня *</label>
+              <input type="text" id="form-student-last" class="form-input" placeholder="Прізвище" />
+              <span class="error-msg" id="err-studentLastName"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-student-email">Електронна пошта *</label>
+              <input type="email" id="form-student-email" class="form-input" placeholder="student@gmail.com" />
+              <span class="error-msg" id="err-studentEmail"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-student-phone">Номер телефону *</label>
+              <input type="text" id="form-student-phone" class="form-input" placeholder="+380123456789" />
+              <span class="error-msg" id="err-studentPhone"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-student-grade">Клас або курс навчання *</label>
+            <input type="text" id="form-student-grade" class="form-input" placeholder="Наприклад: 2 клас або 2 курс" />
+            <span class="error-msg" id="err-studentGrade"></span>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-student-form" class="btn btn-secondary">Скасувати</button>
+            <button type="submit" class="btn btn-primary">Додати учня</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
